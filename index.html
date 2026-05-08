@@ -19,6 +19,9 @@
             justify-content: center;
             align-items: center;
         }
+        p{
+            color: blue;
+        }
 
         .container {
             background-color:rgba(0,0,0,0.5);
@@ -99,6 +102,7 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s;
+            margin-top: 20px;
         }
 
         button[type="submit"]:hover {
@@ -124,40 +128,47 @@
         <form id="login" class="form active">
             <h2>Welcome Back</h2>
             <div class="form-group">
-                <label for="login-email">UserName</label>
-                <input type="email" id="login-email" placeholder="username" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="username" required>
             </div>
             <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" placeholder="********" required>
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="********" required>
             </div>
             <button type="submit">Login</button>
+             <div id="message" style="margin-top:10px;"></div>
         </form>
 
         <form id="signup" class="form">
             <h2>Create Account</h2>
-            <div class="form-group">
-                <label for="signup-name">FirstName</label>
-                <input type="text" id="signup-Firstname" placeholder="firstName" required>
-            </div>
+
             
-            <div class="form-group">
-                <label for="signup-email">LastName</label>
-                <input type="text" id="signup-SecondName" placeholder="secondName" required>
-            </div>
-            
-            
-                
-            <div class="form-group">
-                <label for="signup-email">Email</label>
-                <input type="email" id="signup-email" placeholder="example@gmail.com" required>
-            </div>
-            <div class="form-group">
-                <label for="signup-password">Password</label>
-                <input type="password" id="signup-password" placeholder="******" required>
-            </div>
-            <button type="submit">Signup</button>
+        <label for="firstName">FirstName</label>
+      <input type="text" style="text-transform: uppercase;" id="firstName" placeholder="FIRSTNAME" required>
+
+
+       <label for="secondName">LastName</label>
+      <input type="text" style="text-transform: uppercase;" id="secondName" placeholder="SECONDNAME" required>
+       <label for="phoneNumber">Phone Number</label>
+
+
+      <input type="number" id="phoneNumber" placeholder="PHONENUMBER" required>
+
+
+       <label for="email">Email</label>
+      <input type="email" id="signup-email" placeholder="EMAIL" required>
+
+
+       <label for="password">Password</label>
+      <input type="password" id="signup-password" placeholder="PASSWORD" required>
+
+
+    
+      <button type="submit">Submit</button>
+            <p style="color: #1a17e2;" id="signup-msg"></p>
+           
         </form>
+    
     </div>
 
     <script>
@@ -167,6 +178,89 @@
             document.getElementById(formId).classList.add('active');
             event.target.classList.add('active');
         }
+
+
+        /*SCRIPT FOR LOGIN*/
+       const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxDjZBrTA1DjZxQPV3QPfMb5jhJSF2qvk3O96hOExG04CGDPUF-5Gm0P8BtmAzMoLOOIg/exec';
+const loginForm = document.getElementById('login');
+const messageDiv = document.getElementById('message');
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  
+  messageDiv.innerText = 'Checking...';
+  messageDiv.style.color = 'blue';
+
+  try {
+    // doGet uses URL parameters, not POST body
+    const url = `${WEB_APP_URL}?type=login&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`;
+    
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      messageDiv.innerText = 'Login successful! Welcome ' + data.user;
+      messageDiv.style.color = 'green';
+      // Redirect after login
+      // window.location.href = 'dashboard.html';
+    } else {
+      messageDiv.innerText = 'Incorrect email or password';
+      messageDiv.style.color = 'red';
+    }
+  } catch (error) {
+    messageDiv.innerText = 'Error connecting to server';
+    messageDiv.style.color = 'red';
+    console.error(error);
+  }
+});
+
+
+
+/*SCRIPT FOR SIGNUP*/
+   const scriptURL = 'https://script.google.com/macros/s/AKfycbxeJXCIFJX5AM43g5o2twnB_dOa0z_MZ62qMg0KLUXRv6xVmdX2GlD0oHHha0OvvGNTEQ/exec';
+    const form = document.getElementById('signup');
+    const msg = document.getElementById('signup-msg');
+
+   form.addEventListener('submit', e => {
+  e.preventDefault();
+  msg.style.color = '#333';
+  msg.textContent = 'Submitting...';
+  
+  fetch(scriptURL, {
+    method: 'POST',
+    // mode: 'no-cors', ← DELETE THIS LINE
+    headers: {
+      'Content-Type': 'text/plain' // ← CHANGE THIS
+    },
+    body: JSON.stringify({
+      firstName: document.getElementById('firstName').value,
+      secondName: document.getElementById('secondName').value,
+      phoneNumber: document.getElementById('phoneNumber').value,
+      email: document.getElementById('signup-email').value,
+      password: document.getElementById('signup-password').value,
+    })
+  })
+  .then(res => res.json()) // ← ADD THIS
+  .then(data => {          // ← ADD THIS 
+    if(data.status === 'success') {
+      msg.textContent = 'Data sent Successfully';
+      msg.style.color = 'green';
+      form.reset();
+    } else {
+      msg.textContent = 'Error: ' + data.message;
+      msg.style.color = 'red';
+    }
+  })
+  .catch(error => {
+    msg.textContent = 'Error: ' + error.message;
+    msg.style.color = 'red';
+  });
+});
+
+
     </script>
 </body>
 </html>
